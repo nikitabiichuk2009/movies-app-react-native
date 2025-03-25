@@ -13,6 +13,8 @@ module.exports = {
         darkAccent: "#AB8BFF",
         accentText: "#A8B5DB",
         secondaryText: "#D6C7FF",
+        violetStart: "#d8b4fe",
+        violetEnd: "#a78bfa",
       },
     },
   },
