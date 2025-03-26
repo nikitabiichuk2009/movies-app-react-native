@@ -1,4 +1,4 @@
-import { HeaderLinks } from '@/constants/constants';
+import { HeaderLinks, tintColor } from '@/constants/constants';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
@@ -43,7 +43,7 @@ export default function TabsLayout() {
                 <Image
                   source={link.icon}
                   className="size-5"
-                  style={{ tintColor: focused ? '#151312' : '#A8B5DB' }}
+                  style={{ tintColor: focused ? '#151312' : tintColor }}
                 />
                 {focused && (
                   <Text className="text-secondary text-base font-semibold ml-2">{link.title}</Text>

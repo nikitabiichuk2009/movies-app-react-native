@@ -16,15 +16,11 @@ const Search = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  const { data, loading, error, fetchData, reset } = useFetch(
+  const { data, loading, error, fetchData } = useFetch(
     fetchMovies,
     { searchQuery: '', page: 1 },
     false,
   );
-
-  useEffect(() => {
-    fetchData({ searchQuery: '', page: 1 }).finally(() => setInitialLoading(false));
-  }, []);
 
   useEffect(() => {
     if (data) {
@@ -34,27 +30,14 @@ const Search = () => {
   }, [data]);
 
   useEffect(() => {
-    const trimmedQuery = searchQuery.trim();
-
     const timeout = setTimeout(() => {
-      if (trimmedQuery === '') {
-        setPage(1);
-        setMovies([]);
-        setTotalPages(1);
-        setInitialLoading(true);
+      setPage(1);
+      setMovies([]);
+      setInitialLoading(true);
 
-        fetchData({ searchQuery: '', page: 1 }).finally(() => {
-          setInitialLoading(false);
-        });
-      } else {
-        setPage(1);
-        setMovies([]);
-        setInitialLoading(true);
-
-        fetchData({ searchQuery: trimmedQuery, page: 1 }).finally(() => {
-          setInitialLoading(false);
-        });
-      }
+      fetchData({ searchQuery: searchQuery.trim(), page: 1 }).finally(() => {
+        setInitialLoading(false);
+      });
     }, 800);
 
     return () => clearTimeout(timeout);
@@ -88,10 +71,10 @@ const Search = () => {
             keyExtractor={(item) => item.id.toString()}
             numColumns={3}
             onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.5}
+            onEndReachedThreshold={1}
             ListFooterComponent={
               loading && movies.length > 0 && page < totalPages ? (
-                <ActivityIndicator size="large" color={tintColor} className="mb-4" />
+                <ActivityIndicator size="large" color={tintColor} />
               ) : null
             }
             ListEmptyComponent={
