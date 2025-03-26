@@ -1,10 +1,19 @@
-import { Image, TextInput, View } from "react-native";
-import React from "react";
-import { icons } from "@/constants/icons";
+import { Image, TextInput, View } from 'react-native';
+import React from 'react';
+import { icons } from '@/constants/icons';
+import { tintColor } from '@/constants/constants';
 
-const tintColor = "#A8B5DB";
-
-const SearchBar = ({ onPress, placeholder }: { onPress: () => void, placeholder: string }) => {
+const SearchBar = ({
+  onPress,
+  placeholder,
+  value,
+  onChangeText,
+}: {
+  onPress?: () => void;
+  placeholder: string;
+  value: string;
+  onChangeText: (text: string) => void;
+}) => {
   return (
     <View className="flex-row items-center bg-searchBar rounded-full px-5 py-2">
       <Image
@@ -15,8 +24,8 @@ const SearchBar = ({ onPress, placeholder }: { onPress: () => void, placeholder:
       <TextInput
         placeholder={placeholder}
         placeholderTextColor={tintColor}
-        value=""
-        onChangeText={() => {}}
+        value={value}
+        onChangeText={onChangeText}
         onPress={onPress}
         className="text-white flex-1 ml-2"
       />

@@ -1,12 +1,134 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, Text, View } from 'react-native';
+import { images } from '@/constants/images';
+import { icons } from '@/constants/icons';
+import SearchBar from '@/components/SearchBar';
+import useFetch from '@/services/hooks/useFetch';
+import { fetchMovies } from '@/services/api';
+import MovieCard from '@/components/MovieCard';
+import NoResults from '@/components/NoResults';
+import { tintColor } from '@/constants/constants';
 
 const Search = () => {
-  return (
-    <View>
-      <Text>Search</Text>
-    </View>
-  )
-}
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [initialLoading, setInitialLoading] = useState(true);
 
-export default Search
+  const { data, loading, error, fetchData, reset } = useFetch(
+    fetchMovies,
+    { searchQuery: '', page: 1 },
+    false,
+  );
+
+  useEffect(() => {
+    fetchData({ searchQuery: '', page: 1 }).finally(() => setInitialLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (data) {
+      setTotalPages(data.total_pages);
+      setMovies((prev) => (page === 1 ? data.results : [...prev, ...data.results]));
+    }
+  }, [data]);
+
+  useEffect(() => {
+    const trimmedQuery = searchQuery.trim();
+
+    const timeout = setTimeout(() => {
+      if (trimmedQuery === '') {
+        setPage(1);
+        setMovies([]);
+        setTotalPages(1);
+        setInitialLoading(true);
+
+        fetchData({ searchQuery: '', page: 1 }).finally(() => {
+          setInitialLoading(false);
+        });
+      } else {
+        setPage(1);
+        setMovies([]);
+        setInitialLoading(true);
+
+        fetchData({ searchQuery: trimmedQuery, page: 1 }).finally(() => {
+          setInitialLoading(false);
+        });
+      }
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
+
+  const handleLoadMore = () => {
+    if (page < totalPages && !loading) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchData({ searchQuery, page: nextPage });
+    }
+  };
+
+  return (
+    <View className="flex-1 bg-primary">
+      <Image source={images.bg} resizeMode="cover" className="w-full z-0 absolute" />
+      <Image source={icons.logo} className="w-12 h-12 mt-20 mb-5 mx-auto" />
+      <View className="flex-1 px-6">
+        <SearchBar
+          placeholder="Search for a movie"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <Text className="text-white text-2xl font-bold mt-4 mb-2">Latest Movies</Text>
+        {initialLoading ? (
+          <ActivityIndicator size="large" color={tintColor} className="mt-10" />
+        ) : (
+          <FlatList
+            data={movies}
+            renderItem={({ item }) => <MovieCard movie={item} />}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={3}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              loading && movies.length > 0 && page < totalPages ? (
+                <ActivityIndicator size="large" color={tintColor} className="mb-4" />
+              ) : null
+            }
+            ListEmptyComponent={
+              <View className="mt-10">
+                {loading ? (
+                  <ActivityIndicator size="large" color="#00f" />
+                ) : error ? (
+                  <NoResults
+                    title="Something went wrong"
+                    description="Please try again later"
+                    buttonTitle="Go Home"
+                    isError
+                  />
+                ) : (
+                  <NoResults
+                    title="No Movies Found"
+                    description="Try a different search"
+                    buttonTitle="Clear Search"
+                    onPress={() => setSearchQuery('')}
+                  />
+                )}
+              </View>
+            }
+            columnWrapperStyle={{
+              justifyContent: 'flex-start',
+              gap: 20,
+              paddingRight: 5,
+              marginBottom: 10,
+            }}
+            contentContainerStyle={{
+              paddingBottom: 40,
+            }}
+          />
+        )}
+      </View>
+    </View>
+  );
+};
+
+export default Search;
