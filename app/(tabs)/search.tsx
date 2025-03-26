@@ -8,6 +8,7 @@ import { fetchMovies } from '@/services/api';
 import MovieCard from '@/components/MovieCard';
 import NoResults from '@/components/NoResults';
 import { tintColor } from '@/constants/constants';
+import TopHeader from '@/components/TopHeader';
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,8 +54,7 @@ const Search = () => {
 
   return (
     <View className="flex-1 bg-primary">
-      <Image source={images.bg} resizeMode="cover" className="w-full z-0 absolute" />
-      <Image source={icons.logo} className="w-12 h-12 mt-20 mb-5 mx-auto" />
+      <TopHeader />
       <View className="flex-1 px-6">
         <SearchBar
           placeholder="Search for a movie"
