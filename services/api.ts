@@ -36,3 +36,40 @@ export const fetchMovies = async ({
   const data = await response.json();
   return data;
 };
+
+export const fetchMovieDetails = async ({ movieId }: { movieId: string }) => {
+  const movieResponse = await fetch(`${TMDB_CONFIG.baseUrl}/movie/${movieId}`, {
+    method: 'GET',
+    headers: TMDB_CONFIG.headers,
+  });
+
+  if (!movieResponse.ok) {
+    throw new Error('Failed to fetch movie details', {
+      cause: movieResponse.statusText,
+    });
+  }
+
+  const movieData = await movieResponse.json();
+
+  const videoResponse = await fetch(`${TMDB_CONFIG.baseUrl}/movie/${movieId}/videos`, {
+    method: 'GET',
+    headers: TMDB_CONFIG.headers,
+  });
+
+  if (!videoResponse.ok) {
+    throw new Error('Failed to fetch movie videos', {
+      cause: videoResponse.statusText,
+    });
+  }
+
+  const videoData = await videoResponse.json();
+  const trailer = videoData.results.find(
+    (v: { type: string; site: string; key: string }) =>
+      v.type === 'Trailer' && v.site === 'YouTube',
+  );
+
+  return {
+    ...movieData,
+    videoUrl: trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null,
+  };
+};

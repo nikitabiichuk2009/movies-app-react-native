@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Text, View } from 'react-native';
-import { images } from '@/constants/images';
-import { icons } from '@/constants/icons';
+import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import SearchBar from '@/components/SearchBar';
 import useFetch from '@/services/hooks/useFetch';
 import { fetchMovies } from '@/services/api';
@@ -72,6 +70,7 @@ const Search = () => {
             numColumns={3}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={1}
+            contentContainerStyle={{ paddingBottom: 80 }}
             ListFooterComponent={
               loading && movies.length > 0 && page < totalPages ? (
                 <ActivityIndicator size="large" color={tintColor} />
@@ -103,9 +102,6 @@ const Search = () => {
               gap: 20,
               paddingRight: 5,
               marginBottom: 10,
-            }}
-            contentContainerStyle={{
-              paddingBottom: 40,
             }}
           />
         )}

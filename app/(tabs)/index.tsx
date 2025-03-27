@@ -17,7 +17,7 @@ export default function WelcomeScreen() {
 
         <Text className="text-white text-5xl font-bold text-center mt-8">CineScope</Text>
 
-        <Text className="text-gray-400 text-lg text-center mt-2">
+        <Text className="text-secondaryText text-lg text-center mt-2">
           Discover top-rated movies, explore by genre, and find your next favorite film.
         </Text>
 
