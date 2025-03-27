@@ -46,6 +46,4 @@ const formatMillions = (amount?: number) => {
   return `$${millions.toFixed(1)} million`;
 };
 
-
 export { formatDate, getGenreNames, formatMillions };
-
