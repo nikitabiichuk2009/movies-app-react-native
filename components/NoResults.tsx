@@ -8,14 +8,15 @@ interface Props {
   buttonTitle: string;
   onPress?: () => void;
   isError?: boolean;
+  href?: string;
 }
 
-const NoResults = ({ title, description, buttonTitle, onPress, isError = false }: Props) => {
+const NoResults = ({ title, description, buttonTitle, onPress, isError = false, href }: Props) => {
   const router = useRouter();
 
   const handlePress = () => {
-    if (isError) {
-      router.push('/');
+    if (href) {
+      router.push(href as any);
     } else if (onPress) {
       onPress();
     }

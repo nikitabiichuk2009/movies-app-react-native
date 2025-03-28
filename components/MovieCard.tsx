@@ -4,10 +4,23 @@ import { Link } from 'expo-router';
 import { icons } from '@/constants/icons';
 import { formatDate, getGenreNames } from '@/utils';
 
-const MovieCard = ({ movie }: { movie: Movie }) => {
+const MovieCard = ({
+  movie,
+  number,
+  containerWidth,
+}: {
+  movie: Movie;
+  number?: number;
+  containerWidth?: string;
+}) => {
   return (
-    <Link href={`/movies/${movie.id}`} asChild>
-      <TouchableOpacity className="w-[30%]">
+    <Link href={`/movies/${movie?.id}`} asChild>
+      <TouchableOpacity className={`${containerWidth ? containerWidth : 'w-[30%]'} relative`}>
+        {number && (
+          <View className="absolute -left-1 bottom-[81px] z-40">
+            <Text className="text-white text-5xl font-bold">{number}</Text>
+          </View>
+        )}
         <Image
           source={{
             uri: movie?.poster_path
@@ -22,7 +35,9 @@ const MovieCard = ({ movie }: { movie: Movie }) => {
         </Text>
         <View className="flex-row items-center justify-start gap-x-1 mt-1">
           <Image source={icons.star} className="w-4 h-4" />
-          <Text className="text-white text-sm font-semibold">{movie.vote_average.toFixed(2)}</Text>
+          <Text className="text-white text-sm font-semibold">
+            {Number(movie.vote_average).toFixed(2)}
+          </Text>
         </View>
         <Text className="text-secondaryText text-xs mt-1" numberOfLines={1}>
           {getGenreNames(movie.genre_ids)}

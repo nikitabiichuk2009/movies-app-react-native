@@ -7,6 +7,8 @@ import save from '@/assets/icons/save.png';
 import star from '@/assets/icons/star.png';
 import play from '@/assets/icons/play.png';
 import arrow from '@/assets/icons/arrow.png';
+import eye from '@/assets/icons/eye.png';
+import eyeHide from '@/assets/icons/eye-hide.png';
 
 export const icons = {
   home,
@@ -18,4 +20,6 @@ export const icons = {
   star,
   play,
   arrow,
+  eye,
+  eyeHide,
 };

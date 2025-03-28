@@ -1,12 +1,15 @@
 import { View, Image, ScrollView, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import React from 'react';
-import useFetch from '@/services/hooks/useFetch';
-import { fetchMovieDetails } from '@/services/api';
-import { Link, useLocalSearchParams } from 'expo-router';
+import React, { useCallback } from 'react';
+import useFetch from '@/hooks/useFetch';
+import { fetchMovieDetails } from '@/lib/api';
+import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { tintColor } from '@/constants/constants';
 import { formatDate, formatMillions } from '@/utils';
 import NoResults from '@/components/NoResults';
 import { icons } from '@/constants/icons';
+import GoBackButton from '@/components/GoBaackButton';
+import { viewMovie } from '@/lib/appwrite';
+import { useToast } from '@/hooks/toastContenxt';
 
 const MovieInfo = ({ label, value }: { label: string; value?: string | string | null }) => {
   return (
@@ -25,6 +28,7 @@ const MovieInfo = ({ label, value }: { label: string; value?: string | string | 
 
 const MovieDetails = () => {
   const { id } = useLocalSearchParams();
+  const { showToast } = useToast();
   const {
     data: movie,
     loading,
@@ -32,9 +36,32 @@ const MovieDetails = () => {
     fetchData,
   } = useFetch(fetchMovieDetails, { movieId: id as string });
 
+  useFocusEffect(
+    useCallback(() => {
+      const updateViewCount = async () => {
+        if (movie && movie.id) {
+          try {
+            await viewMovie(
+              String(movie.id),
+              movie.title || 'Untitled',
+              movie.poster_path || '',
+              movie.vote_average || 0,
+              movie.release_date || '',
+              movie?.genres.map((genre: { id: number }) => genre.id) || [],
+            );
+          } catch (err: any) {
+            showToast('Error', 'Something went wrong while updating the view count', 'error');
+          }
+        }
+      };
+
+      updateViewCount();
+    }, [movie]),
+  );
+
   return (
     <View className="flex-1 bg-primary">
-      {loading || (!movie && <ActivityIndicator size="large" color={tintColor} />)}
+      {(loading || !movie) && !error && <ActivityIndicator size="large" color={tintColor} />}
       {error && (
         <NoResults
           title="Error"
@@ -88,7 +115,7 @@ const MovieDetails = () => {
               <MovieInfo label="Overview" value={movie?.overview} />
               <MovieInfo
                 label="Genres"
-                value={movie?.genres.map((genre: any) => genre.name).join(' - ')}
+                value={movie?.genres.map((genre: { name: string }) => genre.name).join(' - ')}
               />
               <View className="flex flex-row justify-between w-1/2">
                 <MovieInfo label="Budget" value={formatMillions(movie?.budget)} />
@@ -96,21 +123,13 @@ const MovieDetails = () => {
               </View>
               <MovieInfo
                 label="Production Companies"
-                value={movie?.production_companies.map((company: any) => company.name).join(' - ')}
+                value={movie?.production_companies
+                  .map((company: { name: string }) => company.name)
+                  .join(' - ')}
               />
             </View>
           </ScrollView>
-          <Link href="/search" asChild>
-            <TouchableOpacity className="bg-darkAccent rounded-full px-5 py-2 flex-row items-center justify-center gap-x-2 z-50 absolute bottom-5 left-0 right-0 mx-5">
-              <Image
-                key={movie?.id}
-                source={icons.arrow}
-                className="size-5 mr-1 mt-0.5 rotate-180"
-                tintColor={tintColor}
-              />
-              <Text className="text-white text-lg font-semibold">Back</Text>
-            </TouchableOpacity>
-          </Link>
+          <GoBackButton href="/search" />
         </>
       )}
     </View>

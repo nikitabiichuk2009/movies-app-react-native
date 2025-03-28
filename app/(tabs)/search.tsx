@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, View } from 'react-native';
 import SearchBar from '@/components/SearchBar';
-import useFetch from '@/services/hooks/useFetch';
-import { fetchMovies } from '@/services/api';
+import { fetchMovies } from '@/lib/api';
 import MovieCard from '@/components/MovieCard';
 import NoResults from '@/components/NoResults';
 import { tintColor } from '@/constants/constants';
 import TopHeader from '@/components/TopHeader';
+import useFetch from '@/hooks/useFetch';
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,6 +86,7 @@ const Search = () => {
                     description="Please try again later"
                     buttonTitle="Go Home"
                     isError
+                    href="/"
                   />
                 ) : (
                   <NoResults

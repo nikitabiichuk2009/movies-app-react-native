@@ -33,11 +33,12 @@ const genres = [
 ];
 
 const getGenreNames = (genreIds: number[]) => {
-  return genreIds
+  const genreNames = genreIds
     .map((id) => genres.find((g) => g.id === id)?.name)
     .filter(Boolean)
     .slice(0, 2)
     .join(' • ');
+  return genreNames;
 };
 
 const formatMillions = (amount?: number) => {
