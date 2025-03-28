@@ -22,6 +22,36 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const avatars = new Avatars(client);
 
+const createMovie = async (
+  id: string,
+  title: string,
+  posterPath: string,
+  voteAverage: number,
+  releaseDate: string,
+  genres: string[],
+) => {
+  try {
+    const newMovie = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.movieCollectionId,
+      ID.unique(),
+      {
+        id,
+        title,
+        poster_path: posterPath,
+        vote_average: voteAverage.toString(),
+        release_date: releaseDate,
+        genre_ids: genres,
+        viewCount: 1,
+      },
+    );
+
+    return newMovie;
+  } catch (error: any) {
+    throw new Error(error.message || 'Error creating movie');
+  }
+};
+
 export async function createUser(
   email: string,
   password: string,
@@ -260,20 +290,7 @@ export async function toggleFavoriteMovie(
     );
 
     if (existingMovies.total === 0) {
-      await databases.createDocument(
-        appwriteConfig.databaseId,
-        appwriteConfig.movieCollectionId,
-        ID.unique(),
-        {
-          id,
-          title,
-          poster_path,
-          vote_average: vote_average.toString(),
-          release_date,
-          genre_ids,
-          viewCount: 0,
-        },
-      );
+      await createMovie(id, title, poster_path, vote_average, release_date, genre_ids);
     }
 
     const currentFavorites: string[] = currentUser.savedMovies || [];
@@ -314,19 +331,27 @@ export async function viewMovie(
   genres: string[],
 ) {
   try {
-    const movieDoc = await databases.getDocument(
+    const movies = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.movieCollectionId,
-      id,
+      [Query.equal('id', id)],
     );
 
-    const currentViewCount = movieDoc.viewCount || 0;
-    return await databases.updateDocument(
+    const movieDoc = movies.documents[0];
+
+    if (!movieDoc) {
+      const newMovie = await createMovie(id, title, posterPath, voteAverage, releaseDate, genres);
+      return newMovie;
+    }
+
+    const currentViewCount = movieDoc?.viewCount || 0;
+    const updatedMovie = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.movieCollectionId,
-      id,
+      movieDoc.$id,
       { viewCount: currentViewCount + 1 },
     );
+    return updatedMovie;
   } catch (error: any) {
     if (
       error.response &&
@@ -334,21 +359,7 @@ export async function viewMovie(
       error.message === 'Document with the requested ID could not be found.'
     ) {
       try {
-        const newMovie = await databases.createDocument(
-          appwriteConfig.databaseId,
-          appwriteConfig.movieCollectionId,
-          ID.unique(),
-          {
-            id,
-            title,
-            poster_path: posterPath,
-            vote_average: voteAverage.toString(),
-            release_date: releaseDate,
-            genre_ids: genres,
-            viewCount: 1,
-          },
-        );
-
+        const newMovie = await createMovie(id, title, posterPath, voteAverage, releaseDate, genres);
         return newMovie;
       } catch (error: any) {
         throw new Error(error.message || 'Error creating movie');
