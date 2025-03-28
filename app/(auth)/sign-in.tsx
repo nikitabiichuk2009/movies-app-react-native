@@ -19,7 +19,7 @@ interface FormState {
 }
 
 export default function SignInScreen() {
-  const { setIsLogged, setUser } = useUserContext();
+  const { setIsLogged, refreshUser } = useUserContext();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -80,7 +80,7 @@ export default function SignInScreen() {
 
         if (response) {
           setIsLogged(true);
-          setUser(response as unknown as UserData);
+          refreshUser();
           router.replace('/(tabs)');
           showToast('Success', 'Signed in successfully', 'success');
         }
@@ -126,7 +126,6 @@ export default function SignInScreen() {
           error={form.errors.email}
         />
 
-
         <FormField
           title="Password"
           value={form.password}
@@ -154,7 +153,7 @@ export default function SignInScreen() {
             </TouchableOpacity>
           </Link>
         </View>
-        {!isKeyboardVisible && <GoBackButton href="/sign-in" />}
+        {!isKeyboardVisible && <GoBackButton />}
       </View>
     </SafeAreaView>
   );

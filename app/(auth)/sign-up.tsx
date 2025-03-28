@@ -21,7 +21,7 @@ interface FormState {
 }
 
 export default function SignUpScreen() {
-  const { setIsLogged, setUser } = useUserContext();
+  const { setIsLogged, refreshUser } = useUserContext();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -92,7 +92,7 @@ export default function SignUpScreen() {
 
         if (response) {
           setIsLogged(true);
-          setUser(response as unknown as UserData);
+          refreshUser();
           router.replace('/(tabs)');
           showToast('Success', 'Account created successfully', 'success');
         }
@@ -171,7 +171,7 @@ export default function SignUpScreen() {
             </TouchableOpacity>
           </Link>
         </View>
-        {!isKeyboardVisible && <GoBackButton href="/sign-in" />}
+        {!isKeyboardVisible && <GoBackButton />}
       </View>
     </SafeAreaView>
   );

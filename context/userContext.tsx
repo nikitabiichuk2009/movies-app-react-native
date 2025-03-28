@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getCurrentUser } from '@/lib/appwrite';
 import { useToast } from '@/context/toastContenxt';
 
@@ -8,6 +8,7 @@ interface UserContextType {
   user: UserData | null;
   setUser: (user: UserData | null) => void;
   loading: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -25,28 +26,27 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+  const checkUser = async () => {
+    try {
+      const response = await getCurrentUser();
 
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const response = await getCurrentUser();
-
-        if (response) {
-          setIsLogged(true);
-          setUser(response as unknown as UserData);
-        } else {
-          setIsLogged(false);
-          setUser(null);
-        }
-      } catch (error: any) {
+      if (response) {
+        setIsLogged(true);
+        setUser(response as unknown as UserData);
+      } else {
         setIsLogged(false);
         setUser(null);
-        showToast('Error', error.message || 'Failed to fetch user data', 'error');
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error: any) {
+      setIsLogged(false);
+      setUser(null);
+      showToast('Error', error.message || 'Failed to fetch user data', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     checkUser();
   }, []);
 
@@ -56,6 +56,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     setUser,
     loading,
+    refreshUser: checkUser,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

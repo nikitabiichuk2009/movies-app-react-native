@@ -1,3 +1,4 @@
+import { hasUserSavedMovie } from '@/utils';
 import { Client, Account, Databases, ID, Avatars, Query } from 'react-native-appwrite';
 
 export const appwriteConfig = {
@@ -204,6 +205,90 @@ export async function getUserById(userId: string) {
   } catch (error: any) {
     console.error('Error fetching user by userId field:', error);
     throw new Error(error.message || 'Error fetching user');
+  }
+}
+
+export async function fetchCommunityUsers(limit = 20, offset = 0) {
+  try {
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [Query.limit(limit), Query.offset(offset), Query.orderDesc('$createdAt')],
+    );
+
+    return {
+      users: response.documents,
+      total: response.total,
+      hasMore: offset + response.documents.length < response.total,
+    };
+  } catch (error: any) {
+    console.error('Error fetching community users:', error);
+    throw new Error(error.message || 'Failed to fetch community users');
+  }
+}
+
+export async function toggleFavoriteMovie(
+  id: string,
+  title: string,
+  poster_path: string,
+  vote_average: number,
+  release_date: string,
+  genre_ids: string[],
+) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error('User not authenticated');
+
+    const existingMovies = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.movieCollectionId,
+      [Query.equal('id', id)],
+    );
+
+    if (existingMovies.total === 0) {
+      await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.movieCollectionId,
+        ID.unique(),
+        {
+          id,
+          title,
+          poster_path,
+          vote_average: vote_average.toString(),
+          release_date,
+          genre_ids,
+          viewCount: 0,
+        },
+      );
+    }
+
+    const currentFavorites: string[] = currentUser.savedMovies || [];
+    const isSaved = hasUserSavedMovie(currentUser as any, id);
+    const updatedFavorites = isSaved
+      ? currentFavorites.filter((movie: any) => String(movie.id) !== String(id))
+      : [
+          ...currentFavorites,
+          {
+            id,
+            title,
+            poster_path,
+            vote_average: vote_average.toString(),
+            release_date,
+            genre_ids,
+          },
+        ];
+
+    const updatedDoc = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      currentUser.$id,
+      { savedMovies: updatedFavorites },
+    );
+
+    return updatedDoc;
+  } catch (error: any) {
+    console.error('Error toggling favorite movie:', error);
+    throw new Error(error.message || 'Error toggling favorite movie');
   }
 }
 

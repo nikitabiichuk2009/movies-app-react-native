@@ -1,15 +1,16 @@
 import { View, Image, ScrollView, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import useFetch from '@/hooks/useFetch';
 import { fetchMovieDetails } from '@/lib/api';
 import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { tintColor } from '@/constants/constants';
-import { formatDate, formatMillions } from '@/utils';
+import { formatDate, formatMillions, hasUserSavedMovie } from '@/utils';
 import NoResults from '@/components/NoResults';
 import { icons } from '@/constants/icons';
 import GoBackButton from '@/components/GoBaackButton';
-import { viewMovie } from '@/lib/appwrite';
+import { toggleFavoriteMovie, viewMovie } from '@/lib/appwrite';
 import { useToast } from '@/context/toastContenxt';
+import { useUserContext } from '@/context/userContext';
 
 const MovieInfo = ({ label, value }: { label: string; value?: string | string | null }) => {
   return (
@@ -29,6 +30,7 @@ const MovieInfo = ({ label, value }: { label: string; value?: string | string | 
 const MovieDetails = () => {
   const { id } = useLocalSearchParams();
   const { showToast } = useToast();
+  const { user, isLogged, refreshUser } = useUserContext();
   const {
     data: movie,
     loading,
@@ -58,6 +60,33 @@ const MovieDetails = () => {
       updateViewCount();
     }, [movie]),
   );
+
+  const isSaved = hasUserSavedMovie(user as any, id as string);
+  const handleToggleSave = async () => {
+    if (!isLogged) {
+      showToast('Error', 'Please login to save movies', 'error');
+      return;
+    }
+
+    try {
+      await toggleFavoriteMovie(
+        String(movie.id),
+        movie.title || 'Untitled',
+        movie.poster_path || '',
+        movie.vote_average || 0,
+        movie.release_date || '',
+        movie?.genres.map((genre: { id: number }) => genre.id) || [],
+      );
+      refreshUser();
+      showToast(
+        'Success',
+        isSaved ? 'Movie removed from favorites' : 'Movie saved to favorites',
+        'success',
+      );
+    } catch (error: any) {
+      showToast('Error', 'Failed to update favorites', 'error');
+    }
+  };
 
   return (
     <View className="flex-1 bg-primary">
@@ -92,7 +121,18 @@ const MovieDetails = () => {
               )}
             </View>
             <View className="flex-col items-start justify-start mt-5 px-5">
-              <Text className="text-white text-2xl font-bold">{movie?.title}</Text>
+              <View className="flex-row items-center justify-between w-full">
+                <Text className="text-white text-2xl font-bold">{movie?.title}</Text>
+                {isLogged && (
+                  <TouchableOpacity onPress={handleToggleSave}>
+                    <Image
+                      source={isSaved ? icons.saveFilled : icons.save}
+                      className="size-8"
+                      tintColor={tintColor}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
               <View className="flex-row items-center justify-start gap-x-2">
                 <Text className="text-secondaryText text-sm font-semibold">
                   {formatDate(movie?.release_date as string)}
@@ -129,7 +169,7 @@ const MovieDetails = () => {
               />
             </View>
           </ScrollView>
-          <GoBackButton href="/search" />
+          <GoBackButton />
         </>
       )}
     </View>

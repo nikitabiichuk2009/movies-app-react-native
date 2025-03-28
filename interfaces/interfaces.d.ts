@@ -84,6 +84,6 @@ interface UserData {
   avatarUrl: string;
   bio: string;
   portfolioUrl: string;
-  savedMovies: string[];
+  savedMovies: Movie[];
   contactOptions: string;
 }

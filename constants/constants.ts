@@ -17,11 +17,6 @@ const HeaderLinks = [
     icon: icons.community,
   },
   {
-    href: 'saved',
-    title: 'Saved',
-    icon: icons.save,
-  },
-  {
     href: 'profile',
     title: 'Profile',
     icon: icons.person,

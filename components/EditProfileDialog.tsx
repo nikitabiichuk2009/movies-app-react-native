@@ -7,12 +7,12 @@ import CustomDialog from './CustomDialog';
 
 const EditProfileDialog = ({
   user,
-  setUser,
+  refreshUser,
   visible,
   onClose,
 }: {
   user: UserData;
-  setUser: (user: UserData) => void;
+  refreshUser: () => Promise<void>;
   visible: boolean;
   onClose: () => void;
 }) => {
@@ -140,7 +140,7 @@ const EditProfileDialog = ({
     if (form.dirty.contactOptions) updates.contactOptions = form.contactOptions;
     try {
       const updatedUser = await updateCurrentUser(updates);
-      setUser(updatedUser as unknown as UserData);
+      refreshUser();
       showToast('Success', 'Profile updated', 'success');
       onClose();
     } catch (err: any) {

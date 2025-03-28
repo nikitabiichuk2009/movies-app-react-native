@@ -59,4 +59,15 @@ const validatePassword = (password: string) => {
 
 const validateUrl = (url: string) => /^https?:\/\/.+\..+/.test(url);
 
-export { formatDate, getGenreNames, formatMillions, validateEmail, validatePassword, validateUrl };
+const hasUserSavedMovie = (user: UserData, id: string) =>
+  user?.savedMovies?.some((movie) => Number(movie.id) === Number(id));
+
+export {
+  formatDate,
+  getGenreNames,
+  formatMillions,
+  validateEmail,
+  validatePassword,
+  validateUrl,
+  hasUserSavedMovie,
+};

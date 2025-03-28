@@ -9,7 +9,7 @@ import play from '@/assets/icons/play.png';
 import arrow from '@/assets/icons/arrow.png';
 import eye from '@/assets/icons/eye.png';
 import eyeHide from '@/assets/icons/eye-hide.png';
-
+import saveFilled from '@/assets/icons/save-filled.png';
 export const icons = {
   home,
   search,
@@ -22,4 +22,5 @@ export const icons = {
   arrow,
   eye,
   eyeHide,
+  saveFilled,
 };
