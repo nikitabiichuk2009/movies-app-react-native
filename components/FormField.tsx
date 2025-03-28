@@ -42,9 +42,8 @@ const FormField = ({
         {image && (
           <Image source={image} resizeMode="contain" style={{ width: 20, height: 20, tintColor }} />
         )}
-
         <TextInput
-          className="text-white ml-2 placeholder:line-clamp-1"
+          className="flex-1 text-white ml-2 placeholder:line-clamp-1"
           value={value}
           placeholder={placeholder}
           placeholderTextColor={tintColor}
@@ -55,10 +54,10 @@ const FormField = ({
         />
 
         {isPassword && (
-          <TouchableOpacity onPress={() => setShowPassword((prev) => !prev)}>
+          <TouchableOpacity className="ml-2" onPress={() => setShowPassword((prev) => !prev)}>
             <Image
               source={showPassword ? icons.eyeHide : icons.eye}
-              className="w-6 h-6 ml-2"
+              className="w-6 h-6"
               resizeMode="contain"
             />
           </TouchableOpacity>

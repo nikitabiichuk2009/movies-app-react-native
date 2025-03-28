@@ -1,3 +1,142 @@
+# Mobile App (React Native)
+
+A mobile application built with React Native and Expo Router, focusing on social connectivity and movie exploration.
+
+## Demo Screenshots
+
+<div align="center">
+  <div style="display: inline-block; margin: 20px;">
+    <h3>Home Screen</h3>
+    <img src="assets/images/demo/home.jpg" width="250" alt="Home Screen" />
+  </div>
+  <div style="display: inline-block; margin: 20px;">
+    <h3>Search & Discovery</h3>
+    <img src="assets/images/demo/search.jpg" width="250" alt="Search Screen" />
+  </div>
+</div>
+
+<div align="center">
+  <div style="display: inline-block; margin: 20px;">
+    <h3>Community</h3>
+    <img src="assets/images/demo/community.jpg" width="250" alt="Community Screen" />
+  </div>
+  <div style="display: inline-block; margin: 20px;">
+    <h3>Profile</h3>
+    <img src="assets/images/demo/profile.jpg" width="250" alt="Profile Screen" />
+  </div>
+</div>
+
+<div align="center">
+  <div style="display: inline-block; margin: 20px;">
+    <h3>Notifications</h3>
+    <img src="assets/images/demo/notifications.jpg" width="250" alt="Notifications Screen" />
+  </div>
+  <div style="display: inline-block; margin: 20px;">
+    <h3>Authentication</h3>
+    <img src="assets/images/demo/login.jpg" width="250" alt="Login Screen" />
+  </div>
+</div>
+
+## Core Features
+
+### Authentication System
+
+- User authentication flow through dedicated auth routes
+- Secure login and registration system
+- Protected routes for authenticated users
+
+### Movie Experience
+
+- Browse and discover movies
+- Movie details and information
+- Personalized movie recommendations
+- Save/bookmark favorite movies
+
+### Social Features
+
+- User profiles with customizable information
+- Contact request system
+- Notification system for social interactions
+- Community exploration and connections
+
+### Navigation
+
+- Tab-based navigation system with:
+  - Movies/Home section
+  - Community/Social section
+  - Notifications center
+  - User profile management
+
+### User Interface
+
+- Modern, dark-themed interface
+- Responsive design for various screen sizes
+- Custom tab bar with active state indicators
+- Loading states and error handling
+- Toast notifications for user feedback
+
+## Technical Structure
+
+```typescript
+app/
+├── (auth)/           # Authentication related screens
+├── (tabs)/           # Main app tabs and navigation
+├── movies/           # Movie browsing and details
+├── profile/          # User profile related screens
+├── _layout.tsx       # Root layout configuration
+└── globals.css       # Global styles
+```
+
+## Key Technologies
+
+- React Native
+- Expo Router for navigation
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Context API for state management
+- Appwrite for backend services
+
+## Features in Detail
+
+### Authentication Flow
+
+- Secure user registration and login
+- Password recovery options
+- Session management
+
+### Profile Management
+
+- Edit personal information
+- Manage contact preferences
+- Profile visibility settings
+- Avatar and user details
+
+### Movie Features
+
+- Movie discovery
+- Search functionality
+- Save favorites
+- Movie recommendations
+
+### Social Features
+
+- Send/receive contact requests
+- Notification management
+- User discovery
+- Profile viewing
+- Contact information sharing
+
+### UI/UX Features
+
+- Intuitive navigation
+- Loading states
+- Error handling
+- Toast notifications
+- Responsive design
+- Dark theme optimization
+
+---
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).

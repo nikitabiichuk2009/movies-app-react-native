@@ -31,7 +31,7 @@ const ConfirmationModal = ({
           <View className="flex-row items-center mb-4">
             <Image
               source={isDestructive ? icons.warning : icons.info}
-              className="size-8 mr-2"
+              className="size-6 mr-2"
               tintColor={isDestructive ? '' : tintColor}
             />
             <Text className="text-white text-xl font-bold">{title}</Text>
