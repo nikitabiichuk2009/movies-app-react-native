@@ -39,13 +39,13 @@ export default function SignUpScreen() {
   };
 
   const handleChange = (field: keyof FormState, value: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       [field]: value,
       errors: {
         ...prev.errors,
-        [field]: ''
-      }
+        [field]: '',
+      },
     }));
   };
 
@@ -74,13 +74,14 @@ export default function SignUpScreen() {
       newErrors.password = 'Password is required';
       isValid = false;
     } else if (!validatePassword(form.password)) {
-      newErrors.password = 'Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number';
+      newErrors.password =
+        'Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number';
       isValid = false;
     }
 
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      errors: newErrors
+      errors: newErrors,
     }));
     return isValid;
   };

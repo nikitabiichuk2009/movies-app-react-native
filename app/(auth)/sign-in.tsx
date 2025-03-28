@@ -30,13 +30,13 @@ export default function SignInScreen() {
   };
 
   const handleChange = (field: keyof FormState, value: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
       [field]: value,
       errors: {
         ...prev.errors,
-        [field]: ''
-      }
+        [field]: '',
+      },
     }));
   };
 
@@ -60,16 +60,16 @@ export default function SignInScreen() {
       isValid = false;
     }
 
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      errors: newErrors
+      errors: newErrors,
     }));
     return isValid;
   };
 
   const handleSignIn = () => {
     if (validateForm()) {
-     // TODO: Handle sign in
+      // TODO: Handle sign in
     }
   };
 
