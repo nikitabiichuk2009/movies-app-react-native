@@ -30,7 +30,7 @@ const NoResults = ({ title, description, buttonTitle, onPress, isError = false, 
       <Text className="text-center text-secondaryText mt-1 mb-2 text-base max-w-md">
         {description}
       </Text>
-      <TouchableOpacity onPress={handlePress} className="bg-darkAccent rounded-full px-6 py-3">
+      <TouchableOpacity onPress={handlePress} className="bg-darkAccent rounded-lg px-6 py-3">
         <Text className="text-white font-semibold">{buttonTitle}</Text>
       </TouchableOpacity>
     </View>

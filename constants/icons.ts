@@ -12,6 +12,9 @@ import eyeHide from '@/assets/icons/eye-hide.png';
 import saveFilled from '@/assets/icons/save-filled.png';
 import notification from '@/assets/icons/notification.png';
 import notificationFilled from '@/assets/icons/notification-filled.png';
+import checkmark from '@/assets/icons/checked.png';
+import warning from '@/assets/icons/warning.png';
+import info from '@/assets/icons/info.png';
 
 export const icons = {
   home,
@@ -28,4 +31,7 @@ export const icons = {
   saveFilled,
   notification,
   notificationFilled,
+  checkmark,
+  warning,
+  info,
 };

@@ -6,6 +6,9 @@ import { useUserContext } from '@/context/userContext';
 
 export default function TabsLayout() {
   const { user } = useUserContext();
+  const hasNotifications =
+    user?.notifications && Array.isArray(user.notifications) && user.notifications.length > 0;
+
   return (
     <Tabs
       screenOptions={{
@@ -31,7 +34,6 @@ export default function TabsLayout() {
     >
       {HeaderLinks.map((link: { href: string; title: string; icon: any; iconFilled?: any }) => {
         const isNotificationsPage = link.href === 'notifications';
-        const hasNotifications = user?.notifications?.length && user?.notifications?.length > 0;
 
         const icon = isNotificationsPage && hasNotifications ? link.iconFilled : link.icon;
 

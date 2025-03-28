@@ -138,7 +138,7 @@ export default function SignUpScreen() {
           <FormField
             title="Username"
             value={form.username}
-            placeholder="Enter your username"
+            placeholder="Create a username"
             handleChangeText={(text) => handleChange('username', text)}
             autoCapitalize="none"
             error={form.errors.username}
@@ -168,14 +168,14 @@ export default function SignUpScreen() {
         <FormField
           title="Password"
           value={form.password}
-          placeholder="Enter your password"
+          placeholder="Create a password"
           handleChangeText={(text) => handleChange('password', text)}
           otherStyles="mt-4"
           error={form.errors.password}
         />
 
         <TouchableOpacity
-          className="bg-darkAccent px-8 py-4 rounded-full mt-10 disabled:opacity-50"
+          className="bg-darkAccent px-8 py-4 rounded-lg mt-10 disabled:opacity-50"
           onPress={handleSignUp}
           disabled={isLoading}
         >

@@ -136,7 +136,7 @@ export default function SignInScreen() {
         />
 
         <TouchableOpacity
-          className="bg-darkAccent px-8 py-4 rounded-full mt-10 disabled:opacity-50"
+          className="bg-darkAccent px-8 py-4 rounded-lg mt-10 disabled:opacity-50"
           onPress={handleSignIn}
           disabled={isLoading}
         >

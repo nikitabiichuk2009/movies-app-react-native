@@ -114,7 +114,7 @@ const MovieDetails = () => {
               />
               {movie.videoUrl && (
                 <Link href={movie.videoUrl} asChild>
-                  <TouchableOpacity className="absolute bottom-4 bg-white right-4 rounded-full p-3">
+                  <TouchableOpacity className="absolute bottom-4 bg-white right-4 rounded-lg p-3">
                     <Image source={icons.play} className="w-5 h-5" tintColor={tintColor} />
                   </TouchableOpacity>
                 </Link>

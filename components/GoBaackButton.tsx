@@ -8,7 +8,7 @@ const GoBackButton = ({ title = 'Go Back' }: { title?: string }) => {
   const router = useRouter();
   return (
     <TouchableOpacity
-      className="bg-darkAccent rounded-full px-5 py-2 flex-row items-center justify-center gap-x-2 z-50 absolute bottom-5 left-0 right-0 mx-5"
+      className="bg-darkAccent rounded-lg px-5 py-2 flex-row items-center justify-center gap-x-2 z-50 absolute bottom-5 left-0 right-0 mx-5"
       onPress={() => router.back()}
     >
       <Image source={icons.arrow} className="size-5 mr-1 mt-0.5 rotate-180" tintColor={tintColor} />

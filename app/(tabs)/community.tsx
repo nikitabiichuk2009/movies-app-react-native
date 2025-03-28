@@ -1,6 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, FlatList, ActivityIndicator, RefreshControl, Text } from 'react-native';
-import { fetchCommunityUsers } from '@/lib/appwrite';
+import {
+  View,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
+import { fetchCommunityUsers, findSimilarUsers } from '@/lib/appwrite';
 import SearchBar from '@/components/SearchBar';
 import { tintColor } from '@/constants/constants';
 import TopHeader from '@/components/TopHeader';
@@ -18,13 +25,13 @@ export default function Communities() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [friendMode, setFriendMode] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => {
     const delay = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm.trim());
     }, 800);
-
     return () => clearTimeout(delay);
   }, [searchTerm]);
 
@@ -33,8 +40,7 @@ export default function Communities() {
       setLoading(true);
       const currentOffset = reset ? 0 : offset;
       const response = await fetchCommunityUsers(LIMIT, currentOffset, debouncedSearchTerm);
-
-      setUsers((prev) => (reset ? (response.users as any) : [...prev, ...response.users]));
+      setUsers(reset ? (response.users as any) : [...users, ...response.users]);
       setHasMore(response.hasMore);
       setOffset(currentOffset + response.users.length);
     } catch (error: any) {
@@ -48,11 +54,15 @@ export default function Communities() {
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
     setOffset(0);
-    fetchUsers(true);
-  }, [debouncedSearchTerm]);
+    if (friendMode) {
+      handleFindFriends();
+    } else {
+      fetchUsers(true);
+    }
+  }, [debouncedSearchTerm, friendMode]);
 
   const handleLoadMore = () => {
-    if (!loading && hasMore) {
+    if (!loading && hasMore && !friendMode) {
       fetchUsers();
     }
   };
@@ -61,16 +71,47 @@ export default function Communities() {
     setSearchTerm(text);
     setOffset(0);
     setUsers([]);
+    if (friendMode) {
+      setFriendMode(false);
+    }
   };
 
-  useEffect(() => {
+  const handleFindFriends = async () => {
+    try {
+      setLoading(true);
+      setFriendMode(true);
+      const similarUsers = await findSimilarUsers();
+      setUsers(similarUsers);
+      setHasMore(false);
+    } catch (error: any) {
+      showToast('Error', error.message || 'Failed to find friends', 'error');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleShowAllUsers = () => {
+    setFriendMode(false);
+    setSearchTerm('');
+    setDebouncedSearchTerm('');
     setOffset(0);
     setUsers([]);
     fetchUsers(true);
-  }, [debouncedSearchTerm]);
+  };
 
   useEffect(() => {
-    fetchUsers(true);
+    if (!friendMode) {
+      setOffset(0);
+      setUsers([]);
+      fetchUsers(true);
+    }
+  }, [debouncedSearchTerm, friendMode]);
+
+  useEffect(() => {
+    if (!friendMode) {
+      fetchUsers(true);
+    }
   }, []);
 
   return (
@@ -79,7 +120,21 @@ export default function Communities() {
       <View className="px-6 flex-1">
         <Text className="text-white text-2xl font-bold mb-4">Community</Text>
 
-        <SearchBar placeholder="Search users" value={searchTerm} onChangeText={handleSearch} />
+        <SearchBar
+          placeholder="Search users"
+          value={searchTerm}
+          onChangeText={handleSearch}
+          disabled={friendMode}
+        />
+
+        <TouchableOpacity
+          onPress={friendMode ? handleShowAllUsers : handleFindFriends}
+          className="bg-darkAccent px-6 py-3 rounded-lg mt-4 disabled:opacity-50"
+        >
+          <Text className="text-white text-lg font-semibold text-center">
+            {friendMode ? 'Show All Users' : 'Find Friends'}
+          </Text>
+        </TouchableOpacity>
 
         {loading && !refreshing && users.length === 0 && (
           <View className="items-center justify-center mt-4">

@@ -59,7 +59,7 @@ const WelcomeScreen = () => {
           </Text>
 
           <Link href="/search" asChild>
-            <TouchableOpacity className="bg-darkAccent px-8 py-4 rounded-full mt-10">
+            <TouchableOpacity className="bg-darkAccent px-8 py-4 rounded-lg mt-10">
               <Text className="text-white text-xl font-semibold">Explore now</Text>
             </TouchableOpacity>
           </Link>

@@ -205,14 +205,14 @@ const EditProfileScreen = () => {
 
         <View className="flex-row gap-x-4 mt-8 mb-10">
           <TouchableOpacity
-            className="flex-1 bg-transparent border border-darkAccent py-4 rounded-full"
+            className="flex-1 bg-transparent border border-darkAccent py-4 rounded-lg"
             onPress={() => router.back()}
           >
             <Text className="text-white text-center text-lg">Cancel</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className={`flex-1 py-4 rounded-full bg-darkAccent`}
+            className={`flex-1 py-4 rounded-lg bg-darkAccent`}
             onPress={handleSubmit}
             disabled={!Object.values(form.dirty).some((value) => value) || isSubmitting}
           >

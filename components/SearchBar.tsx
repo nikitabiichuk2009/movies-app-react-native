@@ -7,11 +7,15 @@ const SearchBar = ({
   placeholder,
   value,
   onChangeText,
+  error,
+  disabled,
 }: {
   onPress?: () => void;
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
+  error?: string | undefined;
+  disabled?: boolean;
 }) => {
   return (
     <FormField
@@ -22,6 +26,8 @@ const SearchBar = ({
       image={icons.search}
       placeholder={placeholder}
       handleChangeText={onChangeText}
+      error={error || ''}
+      disabled={disabled || false}
     />
   );
 };

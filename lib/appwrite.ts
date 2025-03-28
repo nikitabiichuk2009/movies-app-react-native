@@ -433,3 +433,42 @@ export async function deleteNotification(userId: string, fromUserId: string) {
     throw new Error(error.message || 'Failed to delete notification');
   }
 }
+
+export async function findSimilarUsers(): Promise<(UserData & { similarity: number })[]> {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      throw new Error('Current user not found');
+    }
+
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+    );
+
+    const otherUsers: any[] = res.documents.filter(
+      (user: any) => user.userId !== currentUser.userId,
+    );
+
+    const currentUserMovieIds = new Set(
+      (currentUser.savedMovies || []).map((movie: any) => String(movie.id)),
+    );
+
+    const usersWithSimilarity = otherUsers.map((user) => {
+      const userMovieIds = new Set((user.savedMovies || []).map((movie: any) => String(movie.id)));
+      let commonCount = 0;
+      currentUserMovieIds.forEach((id) => {
+        if (userMovieIds.has(id as string)) {
+          commonCount++;
+        }
+      });
+      return { ...user, similarity: commonCount };
+    });
+
+    usersWithSimilarity.sort((a, b) => b.similarity - a.similarity);
+
+    return usersWithSimilarity;
+  } catch (error: any) {
+    throw new Error(error.message || 'Error finding similar users');
+  }
+}

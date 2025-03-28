@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useToast } from '@/context/toastContenxt';
@@ -11,12 +11,13 @@ import GoBackButton from '@/components/GoBaackButton';
 const UserProfileScreen = () => {
   const { id } = useLocalSearchParams();
   const { user: currentUser } = useUserContext();
-  const [user, setUser] = React.useState<UserData | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
-  const [isSending, setIsSending] = React.useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const isAlreadySent = user?.notifications?.includes(currentUser?.userId as string);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -59,7 +60,7 @@ const UserProfileScreen = () => {
           <View className="flex flex-row gap-2">
             <TouchableOpacity
               disabled={isSending || isAlreadySent}
-              className="bg-darkAccent px-6 py-3 rounded-full flex-1 mt-4 disabled:opacity-50"
+              className="bg-darkAccent px-6 py-3 rounded-lg flex-1 mt-4 disabled:opacity-50"
               onPress={handleSendContactRequest}
             >
               <Text className="text-white text-lg font-semibold text-center">
