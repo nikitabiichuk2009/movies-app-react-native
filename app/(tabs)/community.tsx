@@ -14,10 +14,11 @@ import TopHeader from '@/components/TopHeader';
 import NoResults from '@/components/NoResults';
 import { useToast } from '@/context/toastContenxt';
 import UserCard from '@/components/UserCard';
-
+import { useUserContext } from '@/context/userContext';
 const LIMIT = 20;
 
 export default function Communities() {
+  const { isLogged } = useUserContext();
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -77,6 +78,10 @@ export default function Communities() {
   };
 
   const handleFindFriends = async () => {
+    if (!isLogged) {
+      showToast('Error', 'Please login to find friends', 'error');
+      return;
+    }
     try {
       setLoading(true);
       setFriendMode(true);
