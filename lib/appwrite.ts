@@ -337,7 +337,7 @@ export async function viewMovie(
         const newMovie = await databases.createDocument(
           appwriteConfig.databaseId,
           appwriteConfig.movieCollectionId,
-          id,
+          ID.unique(),
           {
             id,
             title,
