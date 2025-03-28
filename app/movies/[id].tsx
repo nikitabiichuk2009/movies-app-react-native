@@ -1,5 +1,5 @@
 import { View, Image, ScrollView, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import useFetch from '@/hooks/useFetch';
 import { fetchMovieDetails } from '@/lib/api';
 import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
@@ -37,6 +37,7 @@ const MovieDetails = () => {
     error,
     fetchData,
   } = useFetch(fetchMovieDetails, { movieId: id as string });
+  const [isSaving, setIsSaving] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -69,6 +70,7 @@ const MovieDetails = () => {
     }
 
     try {
+      setIsSaving(true);
       await toggleFavoriteMovie(
         String(movie.id),
         movie.title || 'Untitled',
@@ -85,6 +87,8 @@ const MovieDetails = () => {
       );
     } catch (error: any) {
       showToast('Error', 'Failed to update favorites', 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -124,10 +128,10 @@ const MovieDetails = () => {
               <View className="flex-row items-center justify-between w-full">
                 <Text className="text-white text-2xl font-bold">{movie?.title}</Text>
                 {isLogged && (
-                  <TouchableOpacity onPress={handleToggleSave}>
+                  <TouchableOpacity onPress={handleToggleSave} disabled={isSaving}>
                     <Image
                       source={isSaved ? icons.saveFilled : icons.save}
-                      className="size-8"
+                      className="size-8 disabled:opacity-50"
                       tintColor={tintColor}
                     />
                   </TouchableOpacity>
