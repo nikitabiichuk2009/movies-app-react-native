@@ -18,7 +18,7 @@ const MovieCard = ({
       <TouchableOpacity className={`${containerWidth ? containerWidth : 'w-[30%]'} relative`}>
         {number && (
           <View className="absolute -left-1 bottom-[81px] z-40">
-            <Text className="text-white text-5xl font-bold">{number}</Text>
+            <Text className="text-white text-7xl font-bold">{number}</Text>
           </View>
         )}
         <Image
