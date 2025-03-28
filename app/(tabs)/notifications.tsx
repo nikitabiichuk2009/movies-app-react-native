@@ -7,7 +7,7 @@ import { tintColor } from '@/constants/constants';
 import TopHeader from '@/components/TopHeader';
 import NoResults from '@/components/NoResults';
 import { icons } from '@/constants/icons';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import ConfirmationModal from '@/components/ConfirmationModal';
 
 interface NotificationUser {
@@ -20,7 +20,7 @@ interface NotificationUser {
 }
 
 const NotificationsScreen = () => {
-  const { user, refreshUser } = useUserContext();
+  const { user, refreshUser, isLogged } = useUserContext();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [notificationUsers, setNotificationUsers] = useState<NotificationUser[]>([]);
@@ -84,6 +84,10 @@ const NotificationsScreen = () => {
       setConfirmModal({ visible: false, userId: '' });
     }
   };
+
+  if (!user || !isLogged) {
+    return <Redirect href="/sign-in" />;
+  }
 
   const renderNotification = ({ item }: { item: NotificationUser }) => (
     <View className="bg-searchBar p-4 rounded-2xl mb-4 mx-6">
