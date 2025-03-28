@@ -38,6 +38,10 @@ const UserProfileScreen = () => {
     try {
       await createNotification(user.userId, currentUser.userId);
       showToast('Success', 'Contact request sent', 'success');
+      setUser((prevUser) => ({
+        ...prevUser as UserData,
+        notifications: [...(prevUser?.notifications || []), currentUser.userId],
+      }));
     } catch (error: any) {
       showToast('Error', error.message || 'Failed to send contact request', 'error');
     } finally {
