@@ -374,7 +374,7 @@ export async function getPopularMovies() {
     const result = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.movieCollectionId,
-      [Query.orderDesc('viewCount'), Query.limit(5)],
+      [Query.orderDesc('viewCount'), Query.limit(7)],
     );
     return result.documents;
   } catch (error: any) {
