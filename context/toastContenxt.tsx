@@ -71,7 +71,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   ) => {
     setToast({ show: true, title, message, type });
 
-    // Hide toast after 3 seconds
     setTimeout(() => {
       animateOut(() => {
         setToast((prev) => ({ ...prev, show: false }));

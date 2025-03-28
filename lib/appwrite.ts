@@ -38,9 +38,6 @@ export async function createUser(email: string, password: string, username: stri
         email,
         username,
         avatarUrl,
-        bio: '',
-        portfolioUrl: '',
-        savedMovies: [],
       },
     );
     return newUser;
@@ -48,6 +45,106 @@ export async function createUser(email: string, password: string, username: stri
     throw new Error(error.message || 'Error creating user');
   }
 }
+
+interface UpdateCurrentUserParams {
+  username?: string;
+  password?: string;
+  oldPassword?: string;
+  bio?: string;
+  portfolioUrl?: string;
+  contactOptions?: string;
+}
+
+export async function updateCurrentUser({
+  username,
+  password,
+  oldPassword,
+  bio,
+  portfolioUrl,
+  contactOptions,
+}: UpdateCurrentUserParams) {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error('User not authenticated');
+    const documentData: Record<string, any> = {};
+
+    if (username && username !== currentUser.name) {
+      await account.updateName(username);
+    }
+
+    if (password && oldPassword) {
+      await account.updatePassword(password, oldPassword);
+    }
+
+    const userDocs = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [Query.equal('userId', currentUser.userId)],
+    );
+
+    const doc = userDocs.documents[0];
+    if (!doc) throw new Error('User document not found');
+
+    if (username !== undefined) {
+      documentData.username = username;
+    }
+
+    if (bio !== undefined) {
+      documentData.bio = bio;
+    }
+    if (portfolioUrl !== undefined) {
+      documentData.portfolioUrl = portfolioUrl;
+    }
+
+    let updatedDoc = doc;
+    if (Object.keys(documentData).length > 0) {
+      updatedDoc = await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.userCollectionId,
+        doc.$id,
+        documentData,
+      );
+    }
+
+    if (contactOptions !== undefined) {
+      documentData.contactOptions = contactOptions;
+    }
+
+    return {
+      ...updatedDoc,
+      username: username || currentUser.name,
+    };
+  } catch (error: any) {
+    console.error('updateCurrentUser failed:', error);
+    throw new Error(error.message || 'Failed to update user');
+  }
+}
+
+// export async function deleteAccount() {
+//   try {
+//     const currentUser = await getCurrentUser();
+//     if (!currentUser) throw new Error('User not authenticated');
+//     const accountId = currentUser.userId;
+//     await account.deleteSession('current');
+//     const userDocs = await databases.listDocuments(
+//       appwriteConfig.databaseId,
+//       appwriteConfig.userCollectionId,
+//       [Query.equal('userId', accountId)]
+//     );
+//     if (userDocs.documents.length > 0) {
+//       const doc = userDocs.documents[0];
+//       await databases.deleteDocument(
+//         appwriteConfig.databaseId,
+//         appwriteConfig.userCollectionId,
+//         doc.$id
+//       );
+//     }
+//     return true;
+//   } catch (error: any) {
+//     console.error('deleteAccount failed:', error);
+//     throw new Error(error.message || 'Failed to delete account');
+//   }
+// }
 
 export async function signIn(email: string, password: string) {
   try {
@@ -91,6 +188,22 @@ export async function signOut() {
     return session;
   } catch (error: any) {
     throw new Error(error.message || 'Error signing out');
+  }
+}
+
+export async function getUserById(userId: string) {
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [Query.equal('userId', userId)],
+    );
+
+    const userDoc = res.documents[0];
+    return userDoc;
+  } catch (error: any) {
+    console.error('Error fetching user by userId field:', error);
+    throw new Error(error.message || 'Error fetching user');
   }
 }
 

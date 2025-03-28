@@ -9,7 +9,7 @@ import NoResults from '@/components/NoResults';
 import { icons } from '@/constants/icons';
 import GoBackButton from '@/components/GoBaackButton';
 import { viewMovie } from '@/lib/appwrite';
-import { useToast } from '@/hooks/toastContenxt';
+import { useToast } from '@/context/toastContenxt';
 
 const MovieInfo = ({ label, value }: { label: string; value?: string | string | null }) => {
   return (

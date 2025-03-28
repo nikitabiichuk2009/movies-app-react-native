@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, SafeAreaView, Keyboard } from 'react-native';
 import { Link, router } from 'expo-router';
 import TopHeader from '@/components/TopHeader';
 import FormField from '@/components/FormField';
 import GoBackButton from '@/components/GoBaackButton';
+import { useUserContext } from '@/context/userContext';
+import { validateEmail, validatePassword } from '@/utils';
+import { createUser } from '@/lib/appwrite';
+import { useToast } from '@/context/toastContenxt';
 
 interface FormState {
   username: string;
@@ -17,6 +21,10 @@ interface FormState {
 }
 
 export default function SignUpScreen() {
+  const { setIsLogged, setUser } = useUserContext();
+  const { showToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [form, setForm] = useState<FormState>({
     username: '',
     email: '',
@@ -27,16 +35,6 @@ export default function SignUpScreen() {
       password: '',
     },
   });
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePassword = (password: string) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-    return passwordRegex.test(password);
-  };
 
   const handleChange = (field: keyof FormState, value: string) => {
     setForm((prev) => ({
@@ -86,14 +84,41 @@ export default function SignUpScreen() {
     return isValid;
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (validateForm()) {
-      // TODO: Handle sign up
+      setIsLoading(true);
+      try {
+        const response = await createUser(form.email, form.password, form.username);
+
+        if (response) {
+          setIsLogged(true);
+          setUser(response as unknown as UserData);
+          router.replace('/(tabs)');
+          showToast('Success', 'Account created successfully', 'success');
+        }
+      } catch (error: any) {
+        showToast('Error', error.message || 'Failed to create account.', 'error');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
-    <View className="flex-1 bg-primary">
+    <SafeAreaView className="flex-1 bg-primary">
       <TopHeader />
 
       <View className="flex-1 px-6 pt-10">
@@ -105,10 +130,8 @@ export default function SignUpScreen() {
           placeholder="Enter your username"
           handleChangeText={(text) => handleChange('username', text)}
           autoCapitalize="none"
+          error={form.errors.username}
         />
-        {form.errors.username && (
-          <Text className="text-red-500 text-sm mt-1">{form.errors.username}</Text>
-        )}
 
         <FormField
           title="Email"
@@ -118,10 +141,8 @@ export default function SignUpScreen() {
           keyboardType="email-address"
           autoCapitalize="none"
           otherStyles="mt-4"
+          error={form.errors.email}
         />
-        {form.errors.email && (
-          <Text className="text-red-500 text-sm mt-1">{form.errors.email}</Text>
-        )}
 
         <FormField
           title="Password"
@@ -129,16 +150,17 @@ export default function SignUpScreen() {
           placeholder="Enter your password"
           handleChangeText={(text) => handleChange('password', text)}
           otherStyles="mt-4"
+          error={form.errors.password}
         />
-        {form.errors.password && (
-          <Text className="text-red-500 text-sm mt-1">{form.errors.password}</Text>
-        )}
 
         <TouchableOpacity
           className="bg-darkAccent px-8 py-4 rounded-full mt-10"
           onPress={handleSignUp}
+          disabled={isLoading}
         >
-          <Text className="text-white text-xl font-semibold text-center">Sign Up</Text>
+          <Text className="text-white text-xl font-semibold text-center">
+            {isLoading ? 'Signing up...' : 'Sign Up'}
+          </Text>
         </TouchableOpacity>
 
         <View className="flex-row justify-center mt-6">
@@ -149,8 +171,8 @@ export default function SignUpScreen() {
             </TouchableOpacity>
           </Link>
         </View>
-        <GoBackButton href="/sign-in" />
+        {!isKeyboardVisible && <GoBackButton href="/sign-in" />}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

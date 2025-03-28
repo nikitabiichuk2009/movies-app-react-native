@@ -1,15 +1,19 @@
 import { Stack } from 'expo-router';
 import './globals.css';
-import { ToastProvider } from '@/hooks/toastContenxt';
+import { ToastProvider } from '@/context/toastContenxt';
+import UserProvider from '@/context/userContext';
 
 export default function RootLayout() {
   return (
     <ToastProvider>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="movies/[id]" options={{ headerShown: false }} />
-      </Stack>
+      <UserProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="movies/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/[id]" options={{ headerShown: false }} />
+        </Stack>
+      </UserProvider>
     </ToastProvider>
   );
 }

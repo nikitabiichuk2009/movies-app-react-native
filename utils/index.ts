@@ -47,4 +47,16 @@ const formatMillions = (amount?: number) => {
   return `$${millions.toFixed(1)} million`;
 };
 
-export { formatDate, getGenreNames, formatMillions };
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePassword = (password: string) => {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  return passwordRegex.test(password);
+};
+
+const validateUrl = (url: string) => /^https?:\/\/.+\..+/.test(url);
+
+export { formatDate, getGenreNames, formatMillions, validateEmail, validatePassword, validateUrl };

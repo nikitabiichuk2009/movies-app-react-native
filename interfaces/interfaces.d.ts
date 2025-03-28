@@ -77,6 +77,7 @@ interface TrendingCardProps {
 }
 
 interface UserData {
+  $id: string;
   userId: string;
   email: string;
   username: string;
@@ -84,4 +85,5 @@ interface UserData {
   bio: string;
   portfolioUrl: string;
   savedMovies: string[];
+  contactOptions: string;
 }

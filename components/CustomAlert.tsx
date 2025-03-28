@@ -21,7 +21,7 @@ const CustomAlert = ({ title, message, onClose, type = 'error' }: CustomAlertPro
   };
 
   return (
-    <View className={`absolute top-5 left-5 right-5 ${getBgColor()} p-4 rounded-xl z-50`}>
+    <View className={`absolute top-5 left-5 right-5 ${getBgColor()} p-4 rounded-xl z-1000`}>
       <View className="flex-row justify-between items-start">
         <View className="flex-1">
           <Text className={`text-white font-bold text-lg`}>{title}</Text>

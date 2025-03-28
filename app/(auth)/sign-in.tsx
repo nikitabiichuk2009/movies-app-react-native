@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { Link, router } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, SafeAreaView, Keyboard } from 'react-native';
+import { Link, useRouter } from 'expo-router';
 import TopHeader from '@/components/TopHeader';
 import FormField from '@/components/FormField';
 import GoBackButton from '@/components/GoBaackButton';
+import { validateEmail } from '@/utils';
+import { useToast } from '@/context/toastContenxt';
+import { getCurrentUser, signIn } from '@/lib/appwrite';
+import { useUserContext } from '@/context/userContext';
 
 interface FormState {
   email: string;
@@ -15,6 +19,11 @@ interface FormState {
 }
 
 export default function SignInScreen() {
+  const { setIsLogged, setUser } = useUserContext();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const { showToast } = useToast();
   const [form, setForm] = useState<FormState>({
     email: '',
     password: '',
@@ -23,11 +32,6 @@ export default function SignInScreen() {
       password: '',
     },
   });
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
 
   const handleChange = (field: keyof FormState, value: string) => {
     setForm((prev) => ({
@@ -67,14 +71,46 @@ export default function SignInScreen() {
     return isValid;
   };
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (validateForm()) {
-      // TODO: Handle sign in
+      setIsLoading(true);
+      try {
+        await signIn(form.email, form.password);
+        const response = await getCurrentUser();
+
+        if (response) {
+          setIsLogged(true);
+          setUser(response as unknown as UserData);
+          router.replace('/(tabs)');
+          showToast('Success', 'Signed in successfully', 'success');
+        }
+      } catch (error: any) {
+        showToast(
+          'Error',
+          error.message || 'Failed to sign in. Please try to create an account first.',
+          'error',
+        );
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
-    <View className="flex-1 bg-primary">
+    <SafeAreaView className="flex-1 bg-primary">
       <TopHeader />
 
       <View className="flex-1 px-6 pt-10">
@@ -87,10 +123,9 @@ export default function SignInScreen() {
           handleChangeText={(text) => handleChange('email', text)}
           keyboardType="email-address"
           autoCapitalize="none"
+          error={form.errors.email}
         />
-        {form.errors.email && (
-          <Text className="text-red-500 text-sm mt-1">{form.errors.email}</Text>
-        )}
+
 
         <FormField
           title="Password"
@@ -98,16 +133,17 @@ export default function SignInScreen() {
           placeholder="Enter your password"
           handleChangeText={(text) => handleChange('password', text)}
           otherStyles="mt-4"
+          error={form.errors.password}
         />
-        {form.errors.password && (
-          <Text className="text-red-500 text-sm mt-1">{form.errors.password}</Text>
-        )}
 
         <TouchableOpacity
-          className="bg-darkAccent px-8 py-4 rounded-full mt-10"
+          className="bg-darkAccent px-8 py-4 rounded-full mt-10 disabled:opacity-50"
           onPress={handleSignIn}
+          disabled={isLoading}
         >
-          <Text className="text-white text-xl font-semibold text-center">Sign In</Text>
+          <Text className="text-white text-xl font-semibold text-center">
+            {isLoading ? 'Signing in...' : 'Sign In'}
+          </Text>
         </TouchableOpacity>
 
         <View className="flex-row justify-center mt-6">
@@ -118,8 +154,8 @@ export default function SignInScreen() {
             </TouchableOpacity>
           </Link>
         </View>
-        <GoBackButton href="/" />
+        {!isKeyboardVisible && <GoBackButton href="/sign-in" />}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

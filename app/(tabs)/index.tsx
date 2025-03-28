@@ -13,7 +13,7 @@ import { images } from '@/constants/images';
 import TopHeader from '@/components/TopHeader';
 import { getPopularMovies } from '@/lib/appwrite';
 import MovieCard from '@/components/MovieCard';
-import { useToast } from '@/hooks/toastContenxt';
+import { useToast } from '@/context/toastContenxt';
 import { tintColor } from '@/constants/constants';
 import NoResults from '@/components/NoResults';
 

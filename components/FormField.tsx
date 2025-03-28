@@ -8,8 +8,9 @@ interface FormFieldProps extends TextInputProps {
   value: string;
   placeholder: string;
   handleChangeText: (text: string) => void;
+  error: string;
   otherStyles?: string;
-  image?: any; // optional icon
+  image?: any;
 }
 
 const FormField = ({
@@ -19,6 +20,7 @@ const FormField = ({
   handleChangeText,
   otherStyles,
   image,
+  error,
   ...props
 }: FormFieldProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -53,6 +55,7 @@ const FormField = ({
           </TouchableOpacity>
         )}
       </View>
+      {error && <Text className="text-red-500 text-base mt-1">{error}</Text>}
     </View>
   );
 };
