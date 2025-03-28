@@ -2,8 +2,10 @@ import { HeaderLinks, tintColor } from '@/constants/constants';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
+import { useUserContext } from '@/context/userContext';
 
 export default function TabsLayout() {
+  const { user } = useUserContext();
   return (
     <Tabs
       screenOptions={{
@@ -27,32 +29,41 @@ export default function TabsLayout() {
         },
       }}
     >
-      {HeaderLinks.map((link: { href: string; title: string; icon: any }) => (
-        <Tabs.Screen
-          key={link.href}
-          name={link.href}
-          options={{
-            title: link.title,
-            headerShown: false,
-            tabBarIcon: ({ focused }) => (
-              <View
-                className={`flex flex-row min-w-[112px] min-h-16 mt-4 justify-center items-center rounded-full overflow-hidden ${
-                  focused ? 'bg-violetStart' : 'bg-transparent'
-                }`}
-              >
-                <Image
-                  source={link.icon}
-                  className="size-5"
-                  style={{ tintColor: focused ? '#151312' : tintColor }}
-                />
-                {focused && (
-                  <Text className="text-secondary text-base font-semibold ml-2">{link.title}</Text>
-                )}
-              </View>
-            ),
-          }}
-        />
-      ))}
+      {HeaderLinks.map((link: { href: string; title: string; icon: any; iconFilled?: any }) => {
+        const isNotificationsPage = link.href === 'notifications';
+        const hasNotifications = user?.notifications?.length && user?.notifications?.length > 0;
+
+        const icon = isNotificationsPage && hasNotifications ? link.iconFilled : link.icon;
+
+        return (
+          <Tabs.Screen
+            key={link.href}
+            name={link.href}
+            options={{
+              title: link.title,
+              headerShown: false,
+              tabBarIcon: ({ focused }) => (
+                <View
+                  className={`flex flex-row min-w-[112px] min-h-16 mt-4 justify-center items-center rounded-full overflow-hidden ${
+                    focused ? 'bg-violetStart' : 'bg-transparent'
+                  }`}
+                >
+                  <Image
+                    source={icon}
+                    className="size-5"
+                    style={{ tintColor: focused ? '#151312' : tintColor }}
+                  />
+                  {focused && (
+                    <Text className="text-secondary text-base font-semibold ml-2">
+                      {link.title}
+                    </Text>
+                  )}
+                </View>
+              ),
+            }}
+          />
+        );
+      })}
     </Tabs>
   );
 }

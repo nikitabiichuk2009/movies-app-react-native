@@ -22,7 +22,12 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const avatars = new Avatars(client);
 
-export async function createUser(email: string, password: string, username: string) {
+export async function createUser(
+  email: string,
+  password: string,
+  username: string,
+  fullName: string,
+) {
   try {
     const newAccount = await account.create(ID.unique(), email, password, username);
     if (!newAccount) {
@@ -39,6 +44,7 @@ export async function createUser(email: string, password: string, username: stri
         email,
         username,
         avatarUrl,
+        fullName,
       },
     );
     return newUser;
@@ -54,6 +60,7 @@ interface UpdateCurrentUserParams {
   bio?: string;
   portfolioUrl?: string;
   contactOptions?: string;
+  fullName?: string;
 }
 
 export async function updateCurrentUser({
@@ -63,6 +70,7 @@ export async function updateCurrentUser({
   bio,
   portfolioUrl,
   contactOptions,
+  fullName,
 }: UpdateCurrentUserParams) {
   try {
     const currentUser = await getCurrentUser();
@@ -96,6 +104,9 @@ export async function updateCurrentUser({
     if (portfolioUrl !== undefined) {
       documentData.portfolioUrl = portfolioUrl;
     }
+    if (fullName !== undefined) {
+      documentData.fullName = fullName;
+    }
 
     let updatedDoc = doc;
     if (Object.keys(documentData).length > 0) {
@@ -116,7 +127,6 @@ export async function updateCurrentUser({
       username: username || currentUser.name,
     };
   } catch (error: any) {
-    console.error('updateCurrentUser failed:', error);
     throw new Error(error.message || 'Failed to update user');
   }
 }
@@ -203,17 +213,22 @@ export async function getUserById(userId: string) {
     const userDoc = res.documents[0];
     return userDoc;
   } catch (error: any) {
-    console.error('Error fetching user by userId field:', error);
     throw new Error(error.message || 'Error fetching user');
   }
 }
 
-export async function fetchCommunityUsers(limit = 20, offset = 0) {
+export async function fetchCommunityUsers(limit = 20, offset = 0, searchTerm: string = '') {
   try {
+    const queries = [Query.limit(limit), Query.offset(offset), Query.orderDesc('$createdAt')];
+
+    if (searchTerm.trim()) {
+      queries.push(Query.search('username', searchTerm.trim()));
+    }
+
     const response = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.userCollectionId,
-      [Query.limit(limit), Query.offset(offset), Query.orderDesc('$createdAt')],
+      queries,
     );
 
     return {
@@ -222,7 +237,6 @@ export async function fetchCommunityUsers(limit = 20, offset = 0) {
       hasMore: offset + response.documents.length < response.total,
     };
   } catch (error: any) {
-    console.error('Error fetching community users:', error);
     throw new Error(error.message || 'Failed to fetch community users');
   }
 }
@@ -287,7 +301,6 @@ export async function toggleFavoriteMovie(
 
     return updatedDoc;
   } catch (error: any) {
-    console.error('Error toggling favorite movie:', error);
     throw new Error(error.message || 'Error toggling favorite movie');
   }
 }
@@ -355,5 +368,68 @@ export async function getPopularMovies() {
     return result.documents;
   } catch (error: any) {
     throw new Error(error.message || 'Error fetching popular movies');
+  }
+}
+
+export async function createNotification(toUserId: string, fromUserId: string) {
+  try {
+    const userDocs = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [Query.equal('userId', toUserId)],
+    );
+
+    if (!userDocs.documents.length) {
+      throw new Error('User document not found');
+    }
+
+    const doc = userDocs.documents[0];
+    const docId = doc.$id;
+
+    const notifications: string[] = doc.notifications || [];
+    notifications.push(fromUserId);
+
+    const updated = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      docId,
+      { notifications },
+    );
+
+    return updated;
+  } catch (error: any) {
+    console.error(error);
+    throw new Error(error.message || 'Failed to create notification');
+  }
+}
+
+export async function deleteNotification(userId: string, fromUserId: string) {
+  try {
+    const userDocs = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [Query.equal('userId', userId)],
+    );
+
+    if (!userDocs.documents.length) {
+      throw new Error('User document not found');
+    }
+
+    const doc = userDocs.documents[0];
+    const docId = doc.$id;
+
+    const updatedNotifs = (doc.notifications || []).filter((id: string) => id !== fromUserId);
+
+    const updated = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      docId,
+      { notifications: updatedNotifs },
+    );
+
+    return updated;
+  } catch (error: any) {
+    console.error(error);
+    throw new Error(error.message || 'Failed to delete notification');
   }
 }

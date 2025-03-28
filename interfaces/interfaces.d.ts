@@ -81,9 +81,11 @@ interface UserData {
   userId: string;
   email: string;
   username: string;
+  fullName: string;
   avatarUrl: string;
   bio: string;
   portfolioUrl: string;
   savedMovies: Movie[];
   contactOptions: string;
+  notifications: string[];
 }

@@ -1,45 +1,17 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-  SafeAreaView,
-  FlatList,
-} from 'react-native';
-import { Link, Redirect, router } from 'expo-router';
-import { signOut } from '@/lib/appwrite';
-import { useToast } from '@/context/toastContenxt';
-import { tintColor } from '@/constants/constants';
+import { View, Text, Image, TouchableOpacity, SafeAreaView, FlatList } from 'react-native';
+import { Link } from 'expo-router';
 import { icons } from '@/constants/icons';
 import TopHeader from '@/components/TopHeader';
-import { useUserContext } from '@/context/userContext';
 import NoResults from '@/components/NoResults';
 import MovieCard from '@/components/MovieCard';
-import Loader from '@/components/Loader';
 
-const ProfileScreen = () => {
-  const { isLogged, user, loading } = useUserContext();
-  const { showToast } = useToast();
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      router.replace('/sign-in');
-      showToast('Success', 'Signed out successfully', 'success');
-    } catch (error: any) {
-      showToast('Error', error.message, 'error');
-    }
-  };
+interface ProfileProps {
+  user: UserData;
+  children?: React.ReactNode;
+}
 
-  if (loading) {
-    return <Loader />;
-  }
-
-  if (!isLogged || !user) {
-    return <Redirect href="/sign-in" />;
-  }
-
+const Profile = ({ user, children }: ProfileProps) => {
   return (
     <SafeAreaView className="flex-1 bg-primary">
       <TopHeader />
@@ -68,19 +40,9 @@ const ProfileScreen = () => {
                 </Link>
               )}
             </View>
-            <View className="px-6 mt-8 w-full flex flex-row gap-2">
-              <Link href="/profile/edit" asChild>
-                <TouchableOpacity className="bg-darkAccent px-6 py-3 rounded-full flex-1">
-                  <Text className="text-white text-lg font-semibold text-center">Edit Profile</Text>
-                </TouchableOpacity>
-              </Link>
-              <TouchableOpacity
-                className="bg-red-500/90 px-6 py-3 rounded-full flex-1"
-                onPress={handleSignOut}
-              >
-                <Text className="text-white text-lg font-semibold text-center">Sign Out</Text>
-              </TouchableOpacity>
-            </View>
+
+            {children && children}
+
             <View className="px-6 mt-10">
               <Text className="text-white text-xl font-bold mb-4">Saved Movies</Text>
             </View>
@@ -111,4 +73,4 @@ const ProfileScreen = () => {
   );
 };
 
-export default ProfileScreen;
+export default Profile;

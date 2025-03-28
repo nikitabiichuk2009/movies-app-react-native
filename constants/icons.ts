@@ -10,6 +10,9 @@ import arrow from '@/assets/icons/arrow.png';
 import eye from '@/assets/icons/eye.png';
 import eyeHide from '@/assets/icons/eye-hide.png';
 import saveFilled from '@/assets/icons/save-filled.png';
+import notification from '@/assets/icons/notification.png';
+import notificationFilled from '@/assets/icons/notification-filled.png';
+
 export const icons = {
   home,
   search,
@@ -23,4 +26,6 @@ export const icons = {
   eye,
   eyeHide,
   saveFilled,
+  notification,
+  notificationFilled,
 };

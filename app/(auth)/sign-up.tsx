@@ -13,10 +13,12 @@ interface FormState {
   username: string;
   email: string;
   password: string;
+  fullName: string;
   errors: {
     username: string;
     email: string;
     password: string;
+    fullName: string;
   };
 }
 
@@ -29,10 +31,12 @@ export default function SignUpScreen() {
     username: '',
     email: '',
     password: '',
+    fullName: '',
     errors: {
       username: '',
       email: '',
       password: '',
+      fullName: '',
     },
   });
 
@@ -52,11 +56,12 @@ export default function SignUpScreen() {
       username: '',
       email: '',
       password: '',
+      fullName: '',
     };
     let isValid = true;
 
-    if (!form.username.trim()) {
-      newErrors.username = 'Username is required';
+    if (!form.username.trim() || form.username.length < 3 || form.username.length > 100) {
+      newErrors.username = 'Username must be between 3 and 100 characters';
       isValid = false;
     }
 
@@ -77,6 +82,11 @@ export default function SignUpScreen() {
       isValid = false;
     }
 
+    if (!form.fullName.trim() || form.fullName.length < 3 || form.fullName.length > 200) {
+      newErrors.fullName = 'Full name must be between 3 and 200 characters';
+      isValid = false;
+    }
+
     setForm((prev) => ({
       ...prev,
       errors: newErrors,
@@ -88,7 +98,7 @@ export default function SignUpScreen() {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        const response = await createUser(form.email, form.password, form.username);
+        const response = await createUser(form.email, form.password, form.username, form.fullName);
 
         if (response) {
           setIsLogged(true);
@@ -124,22 +134,33 @@ export default function SignUpScreen() {
       <View className="flex-1 px-6 pt-10">
         <Text className="text-white text-4xl font-bold mb-8">Create Account</Text>
 
-        <FormField
-          title="Username"
-          value={form.username}
-          placeholder="Enter your username"
-          handleChangeText={(text) => handleChange('username', text)}
-          autoCapitalize="none"
-          error={form.errors.username}
-        />
+        <View className="flex flex-row gap-2 w-full">
+          <FormField
+            title="Username"
+            value={form.username}
+            placeholder="Enter your username"
+            handleChangeText={(text) => handleChange('username', text)}
+            autoCapitalize="none"
+            error={form.errors.username}
+            otherStyles="flex-1"
+          />
 
+          <FormField
+            title="Full Name"
+            value={form.fullName}
+            placeholder="Enter your full name"
+            handleChangeText={(text) => handleChange('fullName', text)}
+            autoCapitalize="none"
+            otherStyles="flex-1"
+            error={form.errors.fullName}
+          />
+        </View>
         <FormField
           title="Email"
           value={form.email}
           placeholder="Enter your email"
-          handleChangeText={(text) => handleChange('email', text)}
-          keyboardType="email-address"
           autoCapitalize="none"
+          handleChangeText={(text) => handleChange('email', text)}
           otherStyles="mt-4"
           error={form.errors.email}
         />
@@ -154,7 +175,7 @@ export default function SignUpScreen() {
         />
 
         <TouchableOpacity
-          className="bg-darkAccent px-8 py-4 rounded-full mt-10"
+          className="bg-darkAccent px-8 py-4 rounded-full mt-10 disabled:opacity-50"
           onPress={handleSignUp}
           disabled={isLoading}
         >

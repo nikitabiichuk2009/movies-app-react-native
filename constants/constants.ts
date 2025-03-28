@@ -17,6 +17,12 @@ const HeaderLinks = [
     icon: icons.community,
   },
   {
+    href: 'notifications',
+    title: 'Notifications',
+    icon: icons.notification,
+    iconFilled: icons.notificationFilled,
+  },
+  {
     href: 'profile',
     title: 'Profile',
     icon: icons.person,

@@ -11,6 +11,7 @@ interface FormFieldProps extends TextInputProps {
   error: string;
   otherStyles?: string;
   image?: any;
+  padding?: string;
 }
 
 const FormField = ({
@@ -21,22 +22,23 @@ const FormField = ({
   otherStyles,
   image,
   error,
+  padding,
   ...props
 }: FormFieldProps) => {
   const [showPassword, setShowPassword] = useState(false);
-  const isPassword = title.toLowerCase() === 'password';
+  const isPassword = title.toLowerCase().includes('password');
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
       {title && <Text className="text-base text-gray-100 font-medium mb-1">{title}</Text>}
 
-      <View className="flex-row items-center bg-searchBar rounded-full px-5 py-2">
+      <View className={`flex-row items-center bg-searchBar rounded-full ${padding || 'px-5 py-2'}`}>
         {image && (
           <Image source={image} resizeMode="contain" style={{ width: 20, height: 20, tintColor }} />
         )}
 
         <TextInput
-          className="text-white flex-1 ml-2"
+          className="text-white flex-1 ml-2 placeholder:line-clamp-1"
           value={value}
           placeholder={placeholder}
           placeholderTextColor={tintColor}
