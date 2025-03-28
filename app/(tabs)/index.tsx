@@ -55,7 +55,8 @@ const WelcomeScreen = () => {
           <Text className="text-white text-5xl font-bold text-center mt-8">CineScope</Text>
 
           <Text className="text-secondaryText text-lg text-center mt-2">
-            Discover top-rated movies, explore by genre, and find your next favorite film.
+            Connect with movie enthusiasts, share recommendations, and discover your next favorite
+            films together. Your personalized cinema community awaits!
           </Text>
 
           <Link href="/search" asChild>
