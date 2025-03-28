@@ -1,8 +1,8 @@
 import { View, Image, ScrollView, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import useFetch from '@/hooks/useFetch';
 import { fetchMovieDetails } from '@/lib/api';
-import { Link, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Link, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { tintColor } from '@/constants/constants';
 import { formatDate, formatMillions, hasUserSavedMovie } from '@/utils';
 import NoResults from '@/components/NoResults';
@@ -41,6 +41,9 @@ const MovieDetails = () => {
 
   useFocusEffect(
     useCallback(() => {
+      if (isSaving) {
+        return;
+      }
       const updateViewCount = async () => {
         if (movie && movie.id) {
           try {
@@ -57,9 +60,8 @@ const MovieDetails = () => {
           }
         }
       };
-
       updateViewCount();
-    }, [movie]),
+    }, [movie, isSaving]),
   );
 
   const isSaved = hasUserSavedMovie(user as any, id as string);
@@ -71,14 +73,7 @@ const MovieDetails = () => {
 
     try {
       setIsSaving(true);
-      await toggleFavoriteMovie(
-        String(movie.id),
-        movie.title || 'Untitled',
-        movie.poster_path || '',
-        movie.vote_average || 0,
-        movie.release_date || '',
-        movie?.genres.map((genre: { id: number }) => genre.id) || [],
-      );
+      await toggleFavoriteMovie(String(movie.id));
       refreshUser();
       showToast(
         'Success',

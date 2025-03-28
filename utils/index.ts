@@ -60,7 +60,7 @@ const validatePassword = (password: string) => {
 const validateUrl = (url: string) => /^https?:\/\/.+\..+/.test(url);
 
 const hasUserSavedMovie = (user: UserData, id: string) =>
-  user?.savedMovies?.some((movie) => Number(movie.id) === Number(id));
+  user?.savedMovies?.some((movie) => String(movie.id) === String(id));
 
 export {
   formatDate,

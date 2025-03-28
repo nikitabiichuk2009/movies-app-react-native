@@ -29,6 +29,11 @@ const Profile = ({ user, children }: ProfileProps) => {
                 <Text className="text-white text-2xl font-bold mt-4">@{user?.username}</Text>
               </View>
               <Text className="text-secondaryText text-lg">{user?.email}</Text>
+              {user?.contactOptions && (
+                <Text className="text-white text-base text-center mx-4 mt-4">
+                  {user.contactOptions}
+                </Text>
+              )}
               {user?.bio && (
                 <Text className="text-white text-base text-center mx-4 mt-4">{user.bio}</Text>
               )}

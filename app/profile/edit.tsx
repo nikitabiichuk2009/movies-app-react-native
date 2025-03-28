@@ -212,7 +212,7 @@ const EditProfileScreen = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className={`flex-1 py-4 rounded-lg bg-darkAccent`}
+            className={`flex-1 py-4 rounded-lg bg-darkAccent disabled:opacity-50`}
             onPress={handleSubmit}
             disabled={!Object.values(form.dirty).some((value) => value) || isSubmitting}
           >
